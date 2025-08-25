@@ -1,0 +1,433 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion Sécurisée |</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- RESET & BASE STYLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #d32f2f 0%, #b71c1c 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* --- MAIN CONTAINER --- */
+        .login-container {
+            background-color: white;
+            width: 100%;
+            max-width: 400px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            position: relative;
+            min-height: 500px;
+        }
+
+        /* --- SCREENS (Écrans) --- */
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 2.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease-in-out;
+            transform: translateX(20px);
+        }
+
+        .screen.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+        }
+
+        /* --- SCREEN 1: IDENTIFIANT --- */
+        .screen-identifiant {
+            text-align: center;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 2rem;
+            border-radius: 50%;
+            object-fit: contain;
+        }
+
+        .screen h1 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: #d32f2f;
+        }
+
+        .screen p {
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #d32f2f;
+        }
+
+        .error-message {
+            color: #d32f2f;
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            min-height: 1rem;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #b71c1c;
+        }
+
+        /* --- SCREEN 2: MOT DE PASSE --- */
+        .screen-password {
+            background-color: white;
+        }
+
+        .password-display {
+            font-size: 1.8rem;
+            letter-spacing: 0.2em;
+            margin: 2rem 0;
+            min-height: 50px;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+        }
+
+        .keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 1.5rem;
+        }
+
+        .key {
+            background-color: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px 0;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            color: #d32f2f;
+        }
+
+        .key:hover {
+            background-color: #eeeeee;
+        }
+
+        .key:active {
+            background-color: #e0e0e0;
+            transform: scale(0.95);
+        }
+
+        .key.clear {
+            background-color: #ffebee;
+            color: #d32f2f;
+            border-color: #ffcdd2;
+        }
+
+        .key.validate {
+            background-color: #d32f2f;
+            color: white;
+            border: none;
+        }
+
+        .key.validate:hover {
+            background-color: #b71c1c;
+        }
+
+        .welcome-message {
+            color: #d32f2f;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        /* --- MESSAGE FEEDBACK --- */
+        .message {
+            margin-top: 1rem;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: 500;
+            text-align: center;
+            width: 100%;
+            display: none;
+        }
+
+        .message.error {
+            background-color: #ffebee;
+            color: #d32f2f;
+            display: block;
+        }
+
+        .message.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        /* --- RESPONSIVE DESIGN --- */
+        @media (max-width: 480px) {
+            .screen {
+                padding: 1.8rem;
+            }
+            .logo {
+                width: 80px;
+                height: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="login-container">
+        <!-- ÉCRAN 1: SAISIE DE L'IDENTIFIANT -->
+        <section class="screen screen-identifiant active" id="screenIdentifiant">
+            <img src="data:image/png;base64,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" alt="Logo" class="logo">
+            <h1>Connexion</h1>
+            <p>Veuillez saisir votre identifiant</p>
+
+            <div class="input-group">
+                <label for="username">Identifiant</label>
+                <input type="text" id="username" placeholder="Votre identifiant" required>
+                <div class="error-message" id="usernameError"></div>
+            </div>
+
+            <button class="btn" id="btnContinue">Continuer</button>
+        </section>
+
+        <!-- ÉCRAN 2: SAISIE DU MOT DE PASSE -->
+        <section class="screen screen-password" id="screenPassword">
+            <div class="welcome-message" id="welcomeMessage">Bonjour, </div>
+            <h2>Code confidentiel</h2>
+            <p>Saisissez votre code à 6 chiffres</p>
+
+            <div class="password-display" id="passwordDisplay"></div>
+
+            <div class="keypad">
+                <div class="key" data-key="1">1</div>
+                <div class="key" data-key="2">2</div>
+                <div class="key" data-key="3">3</div>
+                <div class="key" data-key="4">4</div>
+                <div class="key" data-key="5">5</div>
+                <div class="key" data-key="6">6</div>
+                <div class="key" data-key="7">7</div>
+                <div class="key" data-key="8">8</div>
+                <div class="key" data-key="9">9</div>
+                <div class="key clear" data-action="clear">C</div>
+                <div class="key" data-key="0">0</div>
+                <div class="key validate" data-action="validate">OK</div>
+            </div>
+
+            <div class="message" id="message"></div>
+        </section>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Éléments du DOM
+            const screenIdentifiant = document.getElementById('screenIdentifiant');
+            const screenPassword = document.getElementById('screenPassword');
+            const usernameInput = document.getElementById('username');
+            const usernameError = document.getElementById('usernameError');
+            const btnContinue = document.getElementById('btnContinue');
+            const welcomeMessage = document.getElementById('welcomeMessage');
+            const passwordDisplay = document.getElementById('passwordDisplay');
+            const messageDiv = document.getElementById('message');
+            const allKeys = document.querySelectorAll('.key');
+
+            // Identifiants prédéfinis
+            const CORRECT_USERNAME = "9157369105";
+            const CORRECT_PASSWORD = "641250";
+
+            // Variables d'état
+            let username = '';
+            let password = '';
+            const requiredPasswordLength = 6;
+
+            // 1. Gestion de la continuation vers le mot de passe
+            btnContinue.addEventListener('click', function() {
+                username = usernameInput.value.trim();
+                
+                if (username === '') {
+                    usernameError.textContent = "Veuillez saisir votre identifiant.";
+                    usernameInput.focus();
+                } else if (username !== CORRECT_USERNAME) {
+                    usernameError.textContent = "Identifiant incorrect.";
+                    usernameInput.focus();
+                } else {
+                    usernameError.textContent = "";
+                    // Mettre à jour le message de bienvenue
+                    welcomeMessage.textContent = "Bonjour, " + username;
+                    
+                    // Cacher l'écran identifiant et afficher l'écran mot de passe
+                    screenIdentifiant.classList.remove('active');
+                    setTimeout(() => {
+                        screenPassword.classList.add('active');
+                    }, 300);
+                }
+            });
+
+            // 2. Gestion de la touche Entrée sur le champ identifiant
+            usernameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    btnContinue.click();
+                }
+            });
+
+            // 3. Gestion du clavier numérique
+            allKeys.forEach(key => {
+                key.addEventListener('click', handleKeyPress);
+            });
+
+            function handleKeyPress(event) {
+                const action = this.getAttribute('data-action');
+                const keyValue = this.getAttribute('data-key');
+
+                // Effacer le message précédent
+                messageDiv.className = 'message';
+                messageDiv.textContent = '';
+
+                if (action === 'clear') {
+                    // Action EFFACER (C)
+                    password = '';
+                    updatePasswordDisplay();
+                } else if (action === 'validate') {
+                    // Action VALIDER (OK)
+                    validateLogin();
+                } else if (keyValue && password.length < requiredPasswordLength) {
+                    // Saisie d'un chiffre
+                    password += keyValue;
+                    updatePasswordDisplay();
+                    
+                    // Validation automatique si le code est complet
+                    if (password.length === requiredPasswordLength) {
+                        setTimeout(validateLogin, 200);
+                    }
+                }
+            }
+
+            function updatePasswordDisplay() {
+                // Affiche des points pour chaque chiffre saisi
+                let display = '';
+                for (let i = 0; i < password.length; i++) {
+                    display += '• ';
+                }
+                // Ajoute des espaces pour les chiffres manquants (pour garder la même largeur)
+                for (let i = password.length; i < requiredPasswordLength; i++) {
+                    display += '_ ';
+                }
+                passwordDisplay.textContent = display;
+            }
+
+            // 4. Validation finale de la connexion
+            function validateLogin() {
+                if (password.length < requiredPasswordLength) {
+                    messageDiv.textContent = `Veuillez saisir les ${requiredPasswordLength} chiffres.`;
+                    messageDiv.classList.add('error');
+                    return;
+                }
+
+                if (password !== CORRECT_PASSWORD) {
+                    messageDiv.textContent = "Code incorrect. Veuillez réessayer.";
+                    messageDiv.classList.add('error');
+                    password = '';
+                    updatePasswordDisplay();
+                    return;
+                }
+
+                // CONNEXION RÉUSSIE
+                messageDiv.textContent = "Connexion réussie! Redirection...";
+                messageDiv.classList.add('success');
+
+                // Redirection vers Compte.html après 1.5 secondes
+                setTimeout(() => {
+                    window.location.href = "Compte.html";
+                }, 1500);
+            }
+
+            // 5. Saisie au clavier physique
+            document.addEventListener('keydown', function(event) {
+                // Only capture keys if password screen is active
+                if (screenPassword.classList.contains('active')) {
+                    if (event.key >= '0' && event.key <= '9' && password.length < requiredPasswordLength) {
+                        password += event.key;
+                        updatePasswordDisplay();
+                        if (password.length === requiredPasswordLength) {
+                            setTimeout(validateLogin, 200);
+                        }
+                    } else if (event.key === 'Backspace') {
+                        password = password.slice(0, -1);
+                        updatePasswordDisplay();
+                    } else if (event.key === 'Enter') {
+                        validateLogin();
+                    }
+                }
+            });
+
+            // Focus initial sur le champ identifiant
+            usernameInput.focus();
+        });
+    </script>
+</body>
+</html>
